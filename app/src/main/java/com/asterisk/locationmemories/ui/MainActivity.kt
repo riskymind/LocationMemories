@@ -1,5 +1,6 @@
 package com.asterisk.locationmemories.ui
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,7 +13,9 @@ import com.asterisk.locationmemories.databinding.ActivityMainBinding
 import com.asterisk.locationmemories.models.Place
 import com.asterisk.locationmemories.models.SampleData
 import com.asterisk.locationmemories.models.UserMap
+import com.asterisk.locationmemories.other.Constants.EXTRA_MAP_TITLE
 import com.asterisk.locationmemories.other.Constants.EXTRA_USER_MAP
+import com.asterisk.locationmemories.other.Constants.REQUEST_CODE
 
 private const val TAG = "MainActivity"
 
@@ -37,6 +40,19 @@ class MainActivity : AppCompatActivity() {
                 }
             })
         }
+
+        binding.fabCreateMap.setOnClickListener {
+            val intent = Intent(this, CreateMapActivity::class.java)
+            intent.putExtra(EXTRA_MAP_TITLE, "new map name")
+            startActivityForResult(intent, REQUEST_CODE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
 }
