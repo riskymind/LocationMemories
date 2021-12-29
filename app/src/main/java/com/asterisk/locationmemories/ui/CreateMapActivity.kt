@@ -1,18 +1,21 @@
 package com.asterisk.locationmemories.ui
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.asterisk.locationmemories.R
 import com.asterisk.locationmemories.databinding.ActivityCreateMapBinding
-import com.asterisk.locationmemories.databinding.DialogCreatePlaceBinding
+import com.asterisk.locationmemories.models.Place
+import com.asterisk.locationmemories.models.UserMap
 import com.asterisk.locationmemories.other.Constants.EXTRA_MAP_TITLE
-
-import com.google.android.gms.maps.CameraUpdateFactory
+import com.asterisk.locationmemories.other.Constants.EXTRA_USER_MAP
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -46,6 +49,33 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.app_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.action_save) {
+            if (markers.isEmpty()) {
+                Toast.makeText(
+                    this,
+                    "There must be at least one marker on the map",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return true
+            }
+
+            val places = markers.map { marker -> Place(marker.title!!, marker.snippet!!, marker.position.latitude, marker.position.latitude) }
+            val userMap = intent.getStringExtra(EXTRA_MAP_TITLE)?.let { UserMap(it, places) }
+            val data = Intent()
+            data.putExtra(EXTRA_USER_MAP, userMap)
+            setResult(RESULT_OK, data)
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -66,11 +96,9 @@ class CreateMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.setOnMapLongClickListener { latLng ->
             showAlertDialog(latLng)
         }
+//        val siliconValley = LatLng(37.4, -122.1)
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(siliconValley, 10F))
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
     private fun showAlertDialog(latLng: LatLng) {
